@@ -594,15 +594,17 @@ app = Flask(__name__)
 
 @app.route('/detect_and_resolve_imbalance_across_bilateral_muscle_pair', methods=['POST'])
 def detect_and_resolve_imbalance_across_bilateral_muscle_pair_request():
-    data = request.json
-    emg_left = data.get('emg_left')
-    emg_right = data.get('emg_right')
-    muscle_name = data.get('muscle_name')
-
-    if emg_left is None or emg_right is None or muscle_name is None:
+    emg_left_file = request.files.get('emg_left')
+    emg_right_file = request.files.get('emg_right')
+    muscle_name = request.form.get('muscle_name')
+    
+    if emg_left_file is None or emg_right_file is None or muscle_name is None:
         return jsonify({"error": "Missing data"}), 400
+    
+    emg_left_content = emg_left_file.read()
+    emg_right_content = emg_right_file.read()
 
-    prediction = detect_and_resolve_imbalance_across_bilateral_muscle_pair(emg_left, emg_right, muscle_name)
+    prediction = detect_and_resolve_imbalance_across_bilateral_muscle_pair(emg_left_content, emg_right_content, muscle_name)
     return jsonify(prediction)
 
 if __name__ == '__main__':
