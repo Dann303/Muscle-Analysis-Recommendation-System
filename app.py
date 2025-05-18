@@ -109,7 +109,7 @@ def fix_muscle_names(muscle_string):
                 fixed.append(f"{muscle_list[i+1]} Trapezius")
                 skip_next = True
                 continue
-        fixed.append(muscle_list[i])
+        fixed.append(muscle_list[i].title())
 
     return fixed
 
