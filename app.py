@@ -513,12 +513,16 @@ def detect_and_resolve_imbalance_across_bilateral_muscle_pair(left_emg, right_em
                 "allowed_exercises": allowed_exercises,
                 "allowed_exercises_with_caution": allowed_exercises_with_caution,
                 "not_allowed_exercises": not_allowed_exercises,
-            }
+            },
+            "left_muscle_force": left_force,
+            "right_muscle_force": right_force
         }
     else:
         return {
             "imbalance": False,
-            "percent_difference": percent_diff
+            "percent_difference": percent_diff,
+            "left_muscle_force": left_force,
+            "right_muscle_force": right_force
         }
 
 # %%
