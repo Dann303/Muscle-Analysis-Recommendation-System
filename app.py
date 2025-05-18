@@ -65,6 +65,7 @@ def describe_muscle_role(muscle_name, role):
 # Imports
 import pandas as pd
 import re
+import io
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -74,6 +75,7 @@ import torch.nn as nn
 from collections import Counter
 from collections import OrderedDict
 from scipy.signal import butter, filtfilt
+from flask import Flask, request, jsonify
 
 # Device Type
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -583,32 +585,33 @@ result
 # np.savetxt('npy-test-values/emg_values_4.txt', data, fmt='%s')  # use '%s' for general, or '%.6f' for floats
 
 # %%
-from flask import Flask, request, jsonify
-
 app = Flask(__name__)
-
-# Load your trained model here
-# For example, load a .pkl file or reinitialize the model weights
-
-# result = detect_and_resolve_imbalance_across_bilateral_muscle_pair(left_muscle_waves, right_muscle_waves, 'Upper Trapezius')
 
 @app.route('/detect_and_resolve_imbalance_across_bilateral_muscle_pair', methods=['POST'])
 def detect_and_resolve_imbalance_across_bilateral_muscle_pair_request():
-    emg_left_file = request.files.get('emg_left')
-    emg_right_file = request.files.get('emg_right')
-    muscle_name = request.form.get('muscle_name')
-    
-    if emg_left_file is None or emg_right_file is None or muscle_name is None:
-        return jsonify({"error": "Missing data"}), 400
-    
-    emg_left_content = emg_left_file.read()
-    emg_right_content = emg_right_file.read()
+    try:
+        emg_left_file = request.files.get('emg_left')
+        emg_right_file = request.files.get('emg_right')
+        muscle_name = request.form.get('muscle_name')
 
-    prediction = detect_and_resolve_imbalance_across_bilateral_muscle_pair(emg_left_content, emg_right_content, muscle_name)
-    return jsonify(prediction)
+        if emg_left_file is None or emg_right_file is None or muscle_name is None:
+            return jsonify({"error": "Missing data"}), 400
+
+        emg_left_str = emg_left_file.read().decode('utf-8')
+        emg_right_str = emg_right_file.read().decode('utf-8')
+
+        emg_left_array = np.loadtxt(io.StringIO(emg_left_str))
+        emg_right_array = np.loadtxt(io.StringIO(emg_right_str))
+
+        prediction = detect_and_resolve_imbalance_across_bilateral_muscle_pair(
+            emg_left_array, emg_right_array, muscle_name)
+
+        return jsonify(prediction)
+
+    except Exception as e:
+        return jsonify({"Error, something went wrong!"}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
+    app.run(debug=True, host='0.0.0.0')
 
 
