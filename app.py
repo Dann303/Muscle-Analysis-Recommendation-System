@@ -591,6 +591,13 @@ app = Flask(__name__)
 def home():
     return "Server is alive"
 
+@app.route('/get_muscle_names', methods=['GET'])
+def get_muscle_names():
+    try:
+        return jsonify({"muscle_names": all_unique_muscles})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 @app.route('/detect_and_resolve_imbalance_across_bilateral_muscle_pair', methods=['POST'])
 def detect_and_resolve_imbalance_across_bilateral_muscle_pair_request():
     print("Request received")
