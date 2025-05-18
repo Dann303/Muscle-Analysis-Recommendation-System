@@ -548,32 +548,32 @@ secondary_muscles_unique = get_array_of_array_unique_values(secondary_muscles)
 # print_exercises_in_roles(some_exercises_not_allowed)
 
     
-force_left_good = np.load('npy-test-values/force_values_1.npy') + 70
-force_left_bad = np.load('npy-test-values/force_values_1.npy') + 60
+# force_left_good = np.load('npy-test-values/force_values_1.npy') + 70
+# force_left_bad = np.load('npy-test-values/force_values_1.npy') + 60
 
-force_right_good = np.load('npy-test-values/force_values_2.npy')
+# force_right_good = np.load('npy-test-values/force_values_2.npy')
 
 # force_values_1 = force_left_good
-force_values_1 = force_left_bad
-force_values_2 = force_right_good
+# force_values_1 = force_left_bad
+# force_values_2 = force_right_good
 
-emg_values_1 = np.load('npy-test-values/emg_values_3.npy')
-emg_values_2 = np.load('npy-test-values/emg_values_4.npy')
-emg_values_3 = emg_values_2 + 30
+# emg_values_1 = np.load('npy-test-values/emg_values_3.npy')
+# emg_values_2 = np.load('npy-test-values/emg_values_4.npy')
+# emg_values_3 = emg_values_2 + 30
 
-left_muscle_waves = emg_values_1
-right_muscle_waves = emg_values_2
+# left_muscle_waves = emg_values_1
+# right_muscle_waves = emg_values_2
 
-plt.plot(left_muscle_waves, color="#1f77b4", label="Left Muscle EMG Waves")
-plt.plot(right_muscle_waves, color="orange", label="Right Muscle EMG Waves")
-plt.legend()
-plt.show()
+# plt.plot(left_muscle_waves, color="#1f77b4", label="Left Muscle EMG Waves")
+# plt.plot(right_muscle_waves, color="orange", label="Right Muscle EMG Waves")
+# plt.legend()
+# plt.show()
 
-result = detect_and_resolve_imbalance_across_bilateral_muscle_pair(left_muscle_waves, right_muscle_waves, 'Upper Trapezius')
+# result = detect_and_resolve_imbalance_across_bilateral_muscle_pair(left_muscle_waves, right_muscle_waves, 'Upper Trapezius')
 
-if result['imbalance']: print(f"There's a muscle imbalance in the {result['weaker_muscle']} muscle")
-if not result['imbalance']: print("There's not a muscle imbalance")
-result
+# if result['imbalance']: print(f"There's a muscle imbalance in the {result['weaker_muscle']} muscle")
+# if not result['imbalance']: print("There's not a muscle imbalance")
+# result
 
 # %%
 # import numpy as np
@@ -587,8 +587,14 @@ result
 # %%
 app = Flask(__name__)
 
+@app.route('/')
+def home():
+    return "Server is alive"
+
 @app.route('/detect_and_resolve_imbalance_across_bilateral_muscle_pair', methods=['POST'])
 def detect_and_resolve_imbalance_across_bilateral_muscle_pair_request():
+    print("Request received")
+
     try:
         emg_left_file = request.files.get('emg_left')
         emg_right_file = request.files.get('emg_right')
