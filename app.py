@@ -505,6 +505,9 @@ def detect_and_resolve_imbalance_across_bilateral_muscle_pair(left_emg, right_em
         allowed_exercises_with_caution = get_exercises_by_category(categorized_exercises, green=False, yellow=True, red=False)
         not_allowed_exercises = get_exercises_by_category(categorized_exercises, green=False, yellow=False, red=True)
 
+        left_force = left_force.flatten().tolist()
+        right_force = right_force.flatten().tolist()
+
         return {
             "imbalance": True,
             "percent_difference": percent_diff,
