@@ -481,7 +481,7 @@ def compare_peak_values(force_1, force_2, threshold, padding=250):
 # %%
 # Function that gets emg from 1 pair of bilateral muscle emg waves, muscle name and outputs if theres a muscle imbalance
 # If theres a muscle imbalance recommended exercises are returned along with exercises to avoid and be cautious with
-def detect_and_resolve_imbalance_across_bilateral_muscle_pair(left_emg, right_emg, muscle_name, threshold=0.025): # threshold 0.25
+def detect_and_resolve_imbalance_across_bilateral_muscle_pair(left_emg, right_emg, muscle_name, threshold=0.075): # threshold 7.5%
     # Step 1: Get predicted force values
     left_force = get_predicted_force_from_emg(left_emg)
     right_force = get_predicted_force_from_emg(right_emg)
