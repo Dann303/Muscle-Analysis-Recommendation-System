@@ -485,9 +485,10 @@ def detect_and_resolve_imbalance_across_bilateral_muscle_pair(left_emg, right_em
     # Step 1: Get predicted force values
     left_force = get_predicted_force_from_emg(left_emg)
     right_force = get_predicted_force_from_emg(right_emg)
-    # left_force = force_values_1
-    # right_force = force_values_2
     
+    left_force_list = left_force.flatten().tolist()
+    right_force_list = right_force.flatten().tolist()
+
     # Step 2: Compare peak values
     imbalance_detected, percent_diff = compare_peak_values(left_force, right_force, threshold)
 
@@ -504,10 +505,7 @@ def detect_and_resolve_imbalance_across_bilateral_muscle_pair(left_emg, right_em
         allowed_exercises = get_exercises_by_category(categorized_exercises, green=True, yellow=False, red=False)
         allowed_exercises_with_caution = get_exercises_by_category(categorized_exercises, green=False, yellow=True, red=False)
         not_allowed_exercises = get_exercises_by_category(categorized_exercises, green=False, yellow=False, red=True)
-
-        left_force = left_force.flatten().tolist()
-        right_force = right_force.flatten().tolist()
-
+        
         return {
             "imbalance": True,
             "percent_difference": percent_diff,
@@ -517,15 +515,15 @@ def detect_and_resolve_imbalance_across_bilateral_muscle_pair(left_emg, right_em
                 "allowed_exercises_with_caution": allowed_exercises_with_caution,
                 "not_allowed_exercises": not_allowed_exercises,
             },
-            "left_muscle_force": left_force,
-            "right_muscle_force": right_force
+            "left_muscle_force": left_force_list,
+            "right_muscle_force": right_force_list
         }
     else:
         return {
             "imbalance": False,
             "percent_difference": percent_diff,
-            "left_muscle_force": left_force,
-            "right_muscle_force": right_force
+            "left_muscle_force": left_force_list,
+            "right_muscle_force": right_force_list
         }
 
 # %%
