@@ -166,7 +166,7 @@ def print_all_muscles():
 # %%
 # Function that reads dataset, cleans it and creates the muscle arrays, 7 categories + all unique values
 def prepare_arrays():
-    df = pd.read_csv('model/gym_exercise_dataset.csv')
+    df = pd.read_csv('./model/gym_exercise_dataset.csv')
     exercises = df.to_dict(orient='records')
     columns = list(exercises[0].keys())
 
@@ -496,15 +496,15 @@ def get_force_percentage(force_1, force_2, padding=250):
     # Avoid division by zero and compute percentage difference relative to max at each point
     max_vals = segment_1
     max_vals[max_vals == 0] = 1e-8  # Avoid division by zero
-    percent_values = (segment_2 / max_vals)
+    percent_diff = np.abs(segment_1 - segment_2) / max_vals
 
-    percent_values = percent_values.flatten()
+    percent_diff = percent_diff.flatten()
     weights = weights.flatten()
 
     # Compute weighted average of percentage differences
-    weighted_avg_percentage = float(np.average(percent_values, weights=weights))
+    weighted_avg_diff = float(np.average(percent_diff, weights=weights))
 
-    return weighted_avg_percentage
+    return weighted_avg_diff
 
 # %%
 # Function that gets emg from 1 pair of bilateral muscle emg waves, muscle name and outputs if theres a muscle imbalance
@@ -523,9 +523,9 @@ def detect_and_resolve_imbalance_across_bilateral_muscle_pair(left_emg, right_em
     if imbalance_detected:
         # Step 3: Identify weaker side
         if max(left_force) < max(right_force):
-            weaker_side = "Left"
+            weaker_side = "left"
         else:
-            weaker_side = "Right"
+            weaker_side = "right"
         
         # Step 4: Get corrective exercises
         categorized_exercises = get_categorized_exercises_for_muscle_for_goal(muscle_name, goal='muscle_imbalance')
@@ -544,14 +544,16 @@ def detect_and_resolve_imbalance_across_bilateral_muscle_pair(left_emg, right_em
                 "not_allowed_exercises": not_allowed_exercises,
             },
             "left_muscle_force": left_force_list,
-            "right_muscle_force": right_force_list
+            "right_muscle_force": right_force_list,
+            "muscle_name": muscle_name
         }
     else:
         return {
             "imbalance": False,
             "percent_difference": percent_diff,
             "left_muscle_force": left_force_list,
-            "right_muscle_force": right_force_list
+            "right_muscle_force": right_force_list,
+            "muscle_name": muscle_name
         }
 
 # %%
@@ -569,11 +571,10 @@ def load_optimization_check(max_emg, current_emg, threshold_min=0.70, threshold_
     percentage = get_force_percentage(max_force, current_force)
 
     return {
-        'percentage': percentage,
         'low_intensity': percentage < threshold_min,
         'high_intensity': percentage > threshold_max,
         'max_force': max_force_list,
-        'current_force': current_force_list
+        'current_force': current_force_list,
     }
 
 

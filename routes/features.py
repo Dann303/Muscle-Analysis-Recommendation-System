@@ -34,7 +34,8 @@ def load_optimization_check_request(user_id):
         emg_str = emg_file.read().decode('utf-8')
         emg_array = np.loadtxt(io.StringIO(emg_str))
         response = load_optimization_check(max_emg, emg_array)
-
+        response['muscle_name'] = muscle_name
+        
         save_to_user_history(response, user_id, load_optimization=True)
 
         return jsonify(response)

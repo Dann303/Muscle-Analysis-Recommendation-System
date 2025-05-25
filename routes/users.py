@@ -5,6 +5,8 @@ import numpy as np
 from db import users_collection
 import bcrypt
 
+from lib.serialize_mongo_document import serialize_mongo_document
+
 users_bp = Blueprint('users', __name__)
 
 # User Endpoints
@@ -66,7 +68,28 @@ def delete_user(user_id):
     except Exception as e:
         return jsonify({'error': f'Invalid user_id or error: {str(e)}'}), 400
 
+@users_bp.route('/<user_id>', methods=['PATCH'])
+def update_user(user_id):
+    try:
+        update_data = request.get_json()
+        if not update_data:
+            return jsonify({'error': 'No update data provided'}), 400
 
+        # Update user document with the fields provided in update_data
+        result = users_collection.update_one(
+            {'_id': ObjectId(user_id)},
+            {'$set': update_data}
+        )
+        if result.matched_count == 1:
+            updated_user = users_collection.find_one({'_id': ObjectId(user_id)})
+            updated_user = serialize_mongo_document(updated_user)
+            updated_user.pop('password', None)
+            return jsonify({'message': 'User updated successfully', 'updated_user': updated_user}), 200
+        else:
+            return jsonify({'error': 'User not found'}), 404
+    except Exception as e:
+        return jsonify({'error': f'Invalid user_id or error: {str(e)}'}), 400
+    
 # Login
 @users_bp.route('/login', methods=['POST'])
 def login():
@@ -118,7 +141,7 @@ def add_muscle_max_emg(user_id):
             return jsonify({"error": "User not found or value not changed."}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 400
-    
+
 # Get user muscle max emg recorded
 @users_bp.route('/<user_id>/muscle_max_emg', methods=['GET'])
 def get_muscle_max_emg(user_id):
@@ -134,3 +157,39 @@ def get_muscle_max_emg(user_id):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+    
+@users_bp.route('/<user_id>/history', methods=['DELETE'])
+def remove_history_request(user_id):
+    data = request.get_json()
+    date = data.get('date')
+    history_category = data.get('historyCategory')
+
+    if not date or not history_category:
+        return jsonify({'error': 'date and historyCategory are required'}), 400
+
+    try:
+        user = users_collection.find_one({'_id': ObjectId(user_id)})
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Check if the category exists and is a list
+        history = user.get('history', {})
+        history_list = history.get(history_category, [])
+        if not isinstance(history_list, list):
+            return jsonify({'error': 'History category not found or not a list'}), 400
+
+        # Filter out the entry with the matching date
+        new_history_list = [entry for entry in history_list if entry.get('date') != date]
+        history[history_category] = new_history_list
+
+        # Update the user's history in the database
+        users_collection.update_one(
+            {'_id': ObjectId(user_id)},
+            {'$set': {'history': history}}
+        )
+
+        return jsonify({'message': 'History entry removed successfully'}), 200
+
+    except Exception as e:
+        return jsonify({'error': f'Error: {str(e)}'}), 400
+
