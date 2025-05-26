@@ -523,9 +523,9 @@ def detect_and_resolve_imbalance_across_bilateral_muscle_pair(left_emg, right_em
     if imbalance_detected:
         # Step 3: Identify weaker side
         if max(left_force) < max(right_force):
-            weaker_side = "left"
+            weaker_side = "Left"
         else:
-            weaker_side = "right"
+            weaker_side = "Right"
         
         # Step 4: Get corrective exercises
         categorized_exercises = get_categorized_exercises_for_muscle_for_goal(muscle_name, goal='muscle_imbalance')
