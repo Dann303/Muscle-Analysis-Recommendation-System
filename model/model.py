@@ -496,15 +496,15 @@ def get_force_percentage(force_1, force_2, padding=250):
     # Avoid division by zero and compute percentage difference relative to max at each point
     max_vals = segment_1
     max_vals[max_vals == 0] = 1e-8  # Avoid division by zero
-    percent_diff = np.abs(segment_1 - segment_2) / max_vals
+    percentage = (segment_2 / max_vals)
 
-    percent_diff = percent_diff.flatten()
+    percentage = percentage.flatten()
     weights = weights.flatten()
 
     # Compute weighted average of percentage differences
-    weighted_avg_diff = float(np.average(percent_diff, weights=weights))
+    weighted_avg_percentage = float(np.average(percentage, weights=weights))
 
-    return weighted_avg_diff
+    return weighted_avg_percentage
 
 # %%
 # Function that gets emg from 1 pair of bilateral muscle emg waves, muscle name and outputs if theres a muscle imbalance
