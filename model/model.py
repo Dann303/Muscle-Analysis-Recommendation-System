@@ -575,6 +575,7 @@ def load_optimization_check(max_emg, current_emg, threshold_min=0.70, threshold_
         'high_intensity': percentage > threshold_max,
         'max_force': max_force_list,
         'current_force': current_force_list,
+        'perecntage': percentage
     }
 
 
